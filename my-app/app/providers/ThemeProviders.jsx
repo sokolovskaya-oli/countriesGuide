@@ -1,43 +1,63 @@
 "use client";
-import { ThemeProvider, createGlobalStyle } from "styled-components";
-import { useState, createContext, useContext } from "react";
 
-const ThemeContext = createContext();
+import { ThemeProvider } from "styled-components";
+import { createContext, useState, useContext, useEffect } from "react";
+import { GlobalStyle } from "../styles/global";
 
+// ✅ Define light and dark themes
 const lightTheme = {
-  background: "#ffffff",
-  text: "#000000",
-  link: "#1e90ff",
+  background: "#fff",
+  text: "#000",
+  card: "#f5f5f5",
 };
 
 const darkTheme = {
-  background: "#1a1a1a",
-  text: "#ffffff",
-  link: "#90c1ff",
+  background: "#111",
+  text: "#fff",
+  card: "#1e1e1e",
 };
 
-const GlobalStyle = createGlobalStyle`
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: ${({ theme }) => theme.background};
-    color: ${({ theme }) => theme.text};
-  }
-  a {
-    color: ${({ theme }) => theme.link};
-  }
-`;
+// ✅ Create Theme Context
+const ThemeContext = createContext();
 
-export const useThemeToggle = () => useContext(ThemeContext);
+// ✅ Export hook to use in components
+export const useThemeContext = () => useContext(ThemeContext);
 
+// ✅ Main provider component
 export default function ThemeProviders({ children }) {
-  const [isDark, setIsDark] = useState(false);
-  const toggleTheme = () => setIsDark(!isDark);
+  const [theme, setTheme] = useState(null);
+
+  // Detect system preference or use localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) {
+      setTheme(saved);
+    } else {
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (theme) {
+      localStorage.setItem("theme", theme);
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  const currentTheme = theme === "light" ? lightTheme : darkTheme;
+
+  // ⛔ Avoid hydration mismatch
+  if (!theme) return null;
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
-      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <ThemeProvider theme={currentTheme}>
         <GlobalStyle />
         {children}
       </ThemeProvider>

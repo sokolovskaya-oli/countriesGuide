@@ -1,20 +1,25 @@
 "use client";
-
 import styled from "styled-components";
-import { useThemeToggle } from "../providers/ThemeProviders";
+import { useThemeContext } from "../providers/ThemeProviders";
 
 const Button = styled.button`
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
+  background-color: ${({ theme }) => theme.background};
   color: ${({ theme }) => theme.text};
+  border: 1px solid ${({ theme }) => theme.text};
+  padding: 0.8rem;
+  margin: 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-size: 1.5rem;
 `;
 
 export default function ThemeToggle() {
-  const { isDark, toggleTheme } = useThemeToggle();
-  return <Button onClick={toggleTheme}>{isDark ? "🌞" : "🌙"}</Button>;
+  const { theme, toggleTheme } = useThemeContext();
+
+  // Don't render button if theme not yet determined
+  if (!theme) return null;
+
+  return (
+    <Button onClick={toggleTheme}>{theme === "light" ? "🌙" : "☀️"}</Button>
+  );
 }

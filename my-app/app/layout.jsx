@@ -1,11 +1,12 @@
-import ThemeToggle from "./components/ThemeToggle";
+import "./global.css";
 import StyledComponentsRegistry from "./lib/registry";
-import ApolloProviders from "./providers/ApolloProviders";
 import ThemeProviders from "./providers/ThemeProviders";
+import { ApolloProviders } from "./providers/ApolloProviders";
+import ThemeToggle from "./components/ThemeToggle";
 
 export const metadata = {
-  title: "Countries App",
-  description: "List of countries using GraphQL API",
+  title: "Country List",
+  description: "Next.js + Apollo + Dark/Light Theme",
 };
 
 export default function RootLayout({ children }) {
